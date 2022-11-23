@@ -48,22 +48,18 @@ intents.message_content = True
 bot = commands.Bot(command_prefix="$", intents=intents)
 testingGuilds = TGuilds
 
-@bot.slash_command(description='A command for testing, replies with "Pong!"')
+@bot.slash_command(description='A command for testing, replies with "Pong!" and the ping in ms')
 async def ping(inter):
-    await inter.send(f"Pong!")
+    await inter.send(f"Pong! {bot.latency * 1000:.2f}ms")
 
 @bot.slash_command(description='Automatically roll a di(c)e of your choice, must be in NdN format, defaults to 4d6.')
 async def roll(inter, dice: str = "4d6"):
-    try:
-        rolls, limit = map(int, dice.split("d"))
-    except Exception:
-        await inter.send("This should be impossible to trigger, so if you did, well done you broke my shitty bot lmao")
-        return
+    rolls, limit = map(int, dice.split("d"))
 
     result = ", ".join(str(random.randint(1, limit)) for _ in range(rolls))
     await inter.send(result)
 
-@bot.slash_command(description="A general purpose command for coordinates") #this one command took ***4 DAYS*** to get right, this is a warning to not touch this or deal with hell.
+@bot.slash_command(description="A general purpose command for coordinates") #this one command took ***4 FREAKING DAYS*** to get right, this is a warning to not touch this or deal with hell.
 async def point(interaction, x1: int, z1: int, y1: int, name1: str = "1", x2: int = 0, z2: int = 0, y2: int = 0, name2: str = "2"):
 
     await interaction.response.defer()
@@ -89,9 +85,13 @@ async def point(interaction, x1: int, z1: int, y1: int, name1: str = "1", x2: in
     
     else:
         pointEmbed.add_field(name="ERROR", value="An error has occured. Code: Point (null or zero value exception)")
-        
+    
+    print(pointEmbed)
     await interaction.followup.send(embed=pointEmbed)
 
+#@bot.slash_command(description='A command that contains many refrence images, like trades, ore-gen, and fishing loot')
+#async def ref(inter):
+    
 
 if __name__ == "__main__":
     print(f"attempting to start bot, please be patient.")
