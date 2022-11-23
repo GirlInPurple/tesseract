@@ -1,10 +1,11 @@
 try:
     import nextcord
     from nextcord.ext import commands
+    from nextcord import ui
 except:
     print("bot failed")
 
-import logging, math, random
+import logging, math, random, requests
 from config import *
 
 #logging/debug
@@ -48,6 +49,87 @@ intents.message_content = True
 bot = commands.Bot(command_prefix="$", intents=intents)
 testingGuilds = TGuilds
 
+class DropdownMain(nextcord.ui.Select):
+    def __init__(self):
+        global select
+        select = [
+            nextcord.SelectOption(label="Minecraft"), 
+            #nextcord.SelectOption(label="Terraria")
+        ]
+        super().__init__(placeholder="Select Game", min_values=1, max_values=1, options=select)
+
+    async def callback(self, interaction: nextcord.Interaction):
+        if self.values[0] == "Minecraft":
+            view = DropdownViewMC()
+        elif self.values[0] == "Terraria":
+            view = DropdownViewTR()
+        await interaction.response.send_message(f'You choose {self.values[0]}. Pick a Ref.', view=view)
+
+class DropdownMC(nextcord.ui.Select):
+    def __init__(self):
+        selectRefMC = [
+            nextcord.SelectOption(label="Biomes", description=""),
+            nextcord.SelectOption(label="Enchant Order"),
+            nextcord.SelectOption(label="Fishing"),
+            nextcord.SelectOption(label="Ore Gen"),
+            nextcord.SelectOption(label="Potions"),
+            nextcord.SelectOption(label="Trades")
+        ]
+        super().__init__(placeholder="Select Game", min_values=1, max_values=1, options=selectRefMC)
+        
+    async def callback(self, interaction: nextcord.Interaction):
+        
+        MCembed = nextcord.Embed(title="Minecraft Refrence", colour=0xff00ff)
+        
+        if self.values[0] == "Biomes":
+            MCembed.add_field(name="Biome Generation", value="*may be outdated for the newest versions of the game, 1.18 changed worldgen enough that*")
+            MCembed.set_image(url="https://static.wikia.nocookie.net/minecraft_gamepedia/images/7/73/BiomesGraph.png/revision/latest/scale-to-width-down/250?cb=20200409011906")
+        elif self.values[0] == "Enchant Order":
+            MCembed.add_field(name="Best Enchant Order", value="*Sweeping Edge doesn't exist on Bedrock Edition, skip that if you play on Bedrock.*\n*This chart may be out of date for 1.18+, take it with a grain of salt.*")
+            MCembed.set_image(url="https://preview.redd.it/20c9aerp0we71.png?width=640&crop=smart&auto=webp&s=17858ff0992fc89efb4199d518024681e6cfa8f5")
+        elif self.values[0] == "Fishing":
+            MCembed.add_field(name="Non-Jungle Enchanting Loot", value="*This is only for valid fishing spots; 200 blocks of water, no blocks (except transparent) can be above the water, and 1 fish has to be nearby.*")
+            MCembed.set_image(url="https://cdn.discordapp.com/attachments/835308950395027476/974656713145856010/52b35-16078214820732-800.jpg")
+        elif self.values[0] == "Ore Gen":
+            MCembed.add_field(name="New Ore Gen", value="*+1.18 only, a -1.17 graph is included as refrence.*")
+            MCembed.set_image(url="https://cdn.discordapp.com/attachments/835308950395027476/974656713552707654/5uQl6HiVuZn9oL0GybvvwMCci0QRtzFmClkCKDER2BQ.jpg")
+        elif self.values[0] == "Potions":
+            MCembed.add_field(name="Potion Recipes", value="*1.13 added 2 new potions, Turtle Master and Slowfalling, they are included*")
+            MCembed.set_image(url="https://cdn.discordapp.com/attachments/835308950395027476/974656713825325106/Minecraft_brewing_en.png")
+        elif self.values[0] == "Trades":
+            MCembed.add_field(name="Trades/Shops", value="*+1.14 Villager Trades*")
+            MCembed.set_image(url="https://cdn.discordapp.com/attachments/835308950395027476/974656714332856382/g0ZoRtC.png")
+        await interaction.response.send_message(embed=MCembed)
+        
+class DropdownTR(nextcord.ui.Select):
+    def __init__(self):
+        selectRefTR = [
+            nextcord.SelectOption(label=""),
+            nextcord.SelectOption(label=""),
+            nextcord.SelectOption(label=""),
+            nextcord.SelectOption(label="")
+        ]
+        super().__init__(placeholder="Select Game", min_values=1, max_values=1, options=selectRefTR)
+        
+class DropdownView(nextcord.ui.View):
+    def __init__(self):
+        super().__init__()
+        self.add_item(DropdownMain())
+
+class DropdownViewTR(nextcord.ui.View):
+    def __init__(self):
+        super().__init__()
+        self.add_item(DropdownTR())
+        
+class DropdownViewMC(nextcord.ui.View):
+    def __init__(self):
+        super().__init__()
+        self.add_item(DropdownMC())
+
+@bot.event
+async def on_ready():
+    print(f"Ready!")
+
 @bot.slash_command(description='A command for testing, replies with "Pong!" and the ping in ms')
 async def ping(inter):
     await inter.send(f"Pong! {bot.latency * 1000:.2f}ms")
@@ -89,9 +171,10 @@ async def point(interaction, x1: int, z1: int, y1: int, name1: str = "1", x2: in
     print(pointEmbed)
     await interaction.followup.send(embed=pointEmbed)
 
-#@bot.slash_command(description='A command that contains many refrence images, like trades, ore-gen, and fishing loot')
-#async def ref(inter):
-    
+@bot.slash_command(description='A command that contains many refrence images, like trades, ore-gen, and fishing loot')
+async def ref(inter):
+    view = DropdownView()
+    await inter.send("Choose Game", view=view)
 
 if __name__ == "__main__":
     print(f"attempting to start bot, please be patient.")
