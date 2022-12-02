@@ -1,12 +1,13 @@
+import logging, math, random, os
+from config import *
+
 try:
     import nextcord
     from nextcord.ext import commands
     from nextcord import ui
 except:
-    print("bot failed")
-
-import logging, math, random, requests
-from config import *
+    print("Import failed, installing")
+    os.sys("pip install nextcord") #Python3.11 had some problems with pip when launching, this is my temporary workaround.
 
 #logging/debug
 
@@ -49,12 +50,14 @@ intents.message_content = True
 bot = commands.Bot(command_prefix="$", intents=intents)
 testingGuilds = TGuilds
 
+#Bot Scripts:
 class DropdownMain(nextcord.ui.Select):
     def __init__(self):
         global select
         select = [
-            nextcord.SelectOption(label="Minecraft"), 
-            #nextcord.SelectOption(label="Terraria")
+            nextcord.SelectOption(label="Minecraft"),
+            nextcord.SelectOption(label="Apoc"),
+            nextcord.SelectOption(label="Terraria")
         ]
         super().__init__(placeholder="Select Game", min_values=1, max_values=1, options=select)
 
@@ -63,17 +66,19 @@ class DropdownMain(nextcord.ui.Select):
             view = DropdownViewMC()
         elif self.values[0] == "Terraria":
             view = DropdownViewTR()
+        elif self.values[0] == "Apoc":
+            view = DropdownViewAP()
         await interaction.response.send_message(f'You choose {self.values[0]}. Pick a Ref.', view=view)
 
 class DropdownMC(nextcord.ui.Select):
     def __init__(self):
         selectRefMC = [
             nextcord.SelectOption(label="Biomes", description=""),
-            nextcord.SelectOption(label="Enchant Order"),
-            nextcord.SelectOption(label="Fishing"),
-            nextcord.SelectOption(label="Ore Gen"),
-            nextcord.SelectOption(label="Potions"),
-            nextcord.SelectOption(label="Trades")
+            nextcord.SelectOption(label="Enchant Order", description="The optimal enchanting order for maxxed books and tools"),
+            nextcord.SelectOption(label="Fishing", description="pre-1.16 AFK fishing nerf in any biome but jungle"),
+            nextcord.SelectOption(label="Ore Gen", description=""),
+            nextcord.SelectOption(label="Potions", description=""),
+            nextcord.SelectOption(label="Trades", description="")
         ]
         super().__init__(placeholder="Select Game", min_values=1, max_values=1, options=selectRefMC)
         
@@ -104,27 +109,70 @@ class DropdownMC(nextcord.ui.Select):
 class DropdownTR(nextcord.ui.Select):
     def __init__(self):
         selectRefTR = [
-            nextcord.SelectOption(label=""),
-            nextcord.SelectOption(label=""),
-            nextcord.SelectOption(label=""),
-            nextcord.SelectOption(label="")
+            nextcord.SelectOption(label="nonfunc1"),
+            nextcord.SelectOption(label="nonfunc2"),
+            nextcord.SelectOption(label="nonfunc3"),
+            nextcord.SelectOption(label="nonfunc4")
         ]
         super().__init__(placeholder="Select Game", min_values=1, max_values=1, options=selectRefTR)
+    
+    async def callback(self, interaction: nextcord.Interaction):
         
-class DropdownView(nextcord.ui.View):
+        TRembed = nextcord.Embed(title="Terraria Refrence", colour=0xccffcc)
+        
+        if self.values[0] == "":
+            TRembed.add_field(name="Biome Generation", value="*may be outdated for the newest versions of the game, 1.18 changed worldgen enough that*")
+            TRembed.set_image(url="https://static.wikia.nocookie.net/minecraft_gamepedia/images/7/73/BiomesGraph.png/revision/latest/scale-to-width-down/250?cb=20200409011906")
+        elif self.values[0] == "":
+            TRembed.add_field(name="Biome Generation", value="*may be outdated for the newest versions of the game, 1.18 changed worldgen enough that*")
+            TRembed.set_image(url="https://static.wikia.nocookie.net/minecraft_gamepedia/images/7/73/BiomesGraph.png/revision/latest/scale-to-width-down/250?cb=20200409011906")
+        
+        await interaction.response.send_message(embed=TRembed)
+        
+class DropdownAP(nextcord.ui.Select):
+    def __init__(self):
+        selectRefAP = [
+            nextcord.SelectOption(label="New Maps"),
+            nextcord.SelectOption(label="nonfunc1"),
+            nextcord.SelectOption(label="nonfunc2"),
+            nextcord.SelectOption(label="nonfunc3")
+        ]
+        super().__init__(placeholder="Select Game", min_values=1, max_values=1, options=selectRefAP)
+    
+    async def callback(self, interaction: nextcord.Interaction):
+        
+        APembed = nextcord.Embed(title="Apocalypse Rising Refrence", colour=0xccffcc)
+        
+        if self.values[0] == "New Maps":
+            APembed.add_field(name="Custom 'Reborn' map", value="A map that was made around a year ago according to Reddit")
+            APembed.set_image(url="https://cdn.discordapp.com/attachments/1045910903201218631/1045913471201583214/RDT_20221125_2306025396872290933485586.jpg?width=694&height=694")
+        elif self.values[0] == "":
+            APembed.add_field(name="Biome Generation", value="*may be outdated for the newest versions of the game, 1.18 changed worldgen enough that*")
+            APembed.set_image(url="https://static.wikia.nocookie.net/minecraft_gamepedia/images/7/73/BiomesGraph.png/revision/latest/scale-to-width-down/250?cb=20200409011906")
+        
+        await interaction.response.send_message(embed=APembed)
+        
+class DropdownViewMain(nextcord.ui.View):
     def __init__(self):
         super().__init__()
         self.add_item(DropdownMain())
-
-class DropdownViewTR(nextcord.ui.View):
-    def __init__(self):
-        super().__init__()
-        self.add_item(DropdownTR())
         
 class DropdownViewMC(nextcord.ui.View):
     def __init__(self):
         super().__init__()
         self.add_item(DropdownMC())
+
+class DropdownViewTR(nextcord.ui.View):
+    def __init__(self):
+        super().__init__()
+        self.add_item(DropdownTR())
+
+class DropdownViewAP(nextcord.ui.View):
+    def __init__(self):
+        super().__init__()
+        self.add_item(DropdownAP())
+
+#Bot Commands:
 
 @bot.event
 async def on_ready():
@@ -141,21 +189,17 @@ async def roll(inter, dice: str = "4d6"):
     result = ", ".join(str(random.randint(1, limit)) for _ in range(rolls))
     await inter.send(result)
 
-@bot.slash_command(description="A general purpose command for coordinates") #this one command took ***4 FREAKING DAYS*** to get right, this is a warning to not touch this or deal with hell.
-async def point(interaction, x1: int, z1: int, y1: int, name1: str = "1", x2: int = 0, z2: int = 0, y2: int = 0, name2: str = "2"):
+@bot.slash_command(description="A general purpose command for coordinates") #this one command took ***4 FREAKING DAYS*** to get right, and still breaks half the time it's used, dont touch it you will deal with hell.
+async def point(interaction, x1: int, z1: int, y1: int, name1: str, x2: int, z2: int, y2: int, name2: str, mode: str = nextcord.SlashOption(name='mode', choices={"Single", "Duo"})):
 
     await interaction.response.defer()
-    print(f"{x1, z1, y1, x2, z2, y2, name1, name2}")
+    print(f"{x1, z1, y1, x2, z2, y2, name1, name2, mode}")
     
     pointEmbed = nextcord.Embed(title="Point Command", colour=0xff00ff)
     
-    if x1 and z1 and y1 != "0":
-        
-        pointEmbed.add_field(name="Point "+name1, value=f"\n\nLocation:\nX cord: {x1};\nY cord: {y1};\nZ cord: {z1};\n\nDistance to Origin:\nManhattan: {man(x1, z1, orX, orZ, plus)}\nBeeline (True Pythagorean): {hypot(x1, z1, orX, orZ)}\nModified Pythagorean: {pyth(x1, z1, orX, orZ)}\nModified Pythagorean (3D): {pyth3D(x1, z1, y1, orX, orZ, orY)}\n\nNether Portal:\nIf Cords are in Overworld, build at these cords in Nether: {x1/8, z1/8}\nIf Cords are in Nether, build at these cords in Overworld: {x1*8, z1*8}", inline=False)
+    pointEmbed.add_field(name="Point "+name2, value=f"\n\nLocation:\nX cord: {x2};\nY cord: {y2};\nZ cord: {z2};\n\nDistance to Origin:\nManhattan: {man(x2, z2, orX, orZ, plus)}\nBeeline (True Pythagorean): {hypot(x2, z2, orX, orZ)}\nModified Pythagorean: {pyth(x2, z2, orX, orZ)}\nModified Pythagorean (3D): {pyth3D(x2, z2, y2, orX, orZ, orY)}\n\nNether Portal:\nIf Cords are in Overworld, build at these cords in Nether: {x2/8, z2/8}\nIf Cords are in Nether, build at these cords in Overworld: {x2*8, z2*8}", inline=False)
     
-    if x1 and z1 and y1 and x2 and z2 and y2 != "0":
-        
-        pointEmbed.add_field(name="Point "+name2, value=f"\n\nLocation:\nX cord: {x2};\nY cord: {y2};\nZ cord: {z2};\n\nDistance to Origin:\nManhattan: {man(x2, z2, orX, orZ, plus)}\nBeeline (True Pythagorean): {hypot(x2, z2, orX, orZ)}\nModified Pythagorean: {pyth(x2, z2, orX, orZ)}\nModified Pythagorean (3D): {pyth3D(x2, z2, y2, orX, orZ, orY)}\n\nNether Portal:\nIf Cords are in Overworld, build at these cords in Nether: {x2/8, z2/8}\nIf Cords are in Nether, build at these cords in Overworld: {x2*8, z2*8}", inline=False)
+    if mode == "Duo":
         
         spawner = ""
         if pyth3D(x1, z1, y1, x2, z2, y2) < 32: 
@@ -163,18 +207,22 @@ async def point(interaction, x1: int, z1: int, y1: int, name1: str = "1", x2: in
         else: 
             spawner = "No, too far away"
             
-            pointEmbed.add_field(name="Both Points", value=f"\n*Distance between points {name1} and {name2}:*\n*Total Distance:*\nManhattan: {man(x1,z1,x2,z2,plus)}\nBeeline (True Pythagorean): {hypot(x1,z1,x2,z2)}\nModified Pythagorean: {pyth(x1, z1, x2, z2)}\nModified Pythagorean (3D): {pyth3D(x1, z1, y1, x2, z2, y2)}\n\nDistance / 8 (to account for Nether travel):\nManhattan: {man(x1,z1,x2,z2,plus)/8}\nBeeline (True Pythagorean): {hypot(x1,z1,x2,z2)/8}\nModified Pythagorean: {pyth(x1, z1, x2, z2)/8}\nModified Pythagorean (3D): {pyth3D(x1, z1, y1, x2, z2, y2)/8}\n\n*Misc:*\nCan be used as a spawner farm? {spawner}\nHalfway Point (2D): {(x1+x2)/2, (z1+z2)/2}\nHalfway Point (3D): {(x1+x2)/2, (z1+z2)/2, (y1+y2)/2}\n\n***Notes:***\n1. Origin is set to 0,64,0, but can be changed if you prefer 0,0,0\n2. Negative numbers are not guaranteed to work 100% of the time, and due to all of the abs() calls adding the negative symbol is pretty redundant.\n3. all cordinates are in XZY format, ***not*** XYZ")
+        pointEmbed.add_field(name="Both Points", value=f"\n*Distance between points {name1} and {name2}:*\n*Total Distance:*\nManhattan: {man(x1,z1,x2,z2,plus)}\nBeeline (True Pythagorean): {hypot(x1,z1,x2,z2)}\nModified Pythagorean: {pyth(x1, z1, x2, z2)}\nModified Pythagorean (3D): {pyth3D(x1, z1, y1, x2, z2, y2)}\n\nDistance / 8 (to account for Nether travel):\nManhattan: {man(x1,z1,x2,z2,plus)/8}\nBeeline (True Pythagorean): {hypot(x1,z1,x2,z2)/8}\nModified Pythagorean: {pyth(x1, z1, x2, z2)/8}\nModified Pythagorean (3D): {pyth3D(x1, z1, y1, x2, z2, y2)/8}\n\n*Misc:*\nCan be used as a spawner farm? {spawner}\nHalfway Point (2D): {(x1+x2)/2, (z1+z2)/2}\nHalfway Point (3D): {(x1+x2)/2, (z1+z2)/2, (y1+y2)/2}\n\n***Notes:***\n1. Origin is set to 0,64,0, but can be changed if you prefer 0,0,0\n2. Negative numbers are not guaranteed to work 100% of the time, and due to all of the abs() calls adding the negative symbol is pretty redundant.\n3. all cordinates are in XZY format, ***not*** XYZ.")
     
-    else:
-        pointEmbed.add_field(name="ERROR", value="An error has occured. Code: Point (null or zero value exception)")
-    
-    print(pointEmbed)
     await interaction.followup.send(embed=pointEmbed)
 
-@bot.slash_command(description='A command that contains many refrence images, like trades, ore-gen, and fishing loot')
+@bot.slash_command(description='A command that contains many refrence images, like trades, ore-gen, maps, and fishing loot')
 async def ref(inter):
-    view = DropdownView()
+    view = DropdownViewMain()
     await inter.send("Choose Game", view=view)
+
+@bot.slash_command(description='A general help command')
+async def help(inter):
+    
+    helpEmbed = nextcord.Embed(title='Tesseract Help/About', colour=0xffffff)
+    helpEmbed.add_field(name='Main Contributers', value='***<@624191654282395648>:*** Helping with the bot a little\n***<@625855485773611018>:*** Asked for Apoc1 support for his private server, I obliged')
+    helpEmbed.add_field(name='Commands', value='`/help`: This embed you\'re looking at now with everything you will ever need\n`/point`: A complex command for dealing with shapes, lines, and other geometry, very useful for complex farms in Minecraft as they have to just the right distance away depending on the farm.\n`/ref`: The remade refrence commmand, it displays refrences from 3 different games, Apoc, Minecraft, and Terraria/Calamity.')
+    await inter.response.send_message(embed=helpEmbed)
 
 if __name__ == "__main__":
     print(f"attempting to start bot, please be patient.")

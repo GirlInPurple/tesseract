@@ -18,7 +18,7 @@ If you are on the FinalRepublic Discord server that this bot is for, add whateve
 For everyone else looking here for whatever reason, feel free to submit a RP or just fork off this project and go your own direction, its MIT lisence for a reason.
 
 ## TODO:
-- Refrence Sheet command
-- Terriara/Calamity Support
-- Twitch/YT API
+- Finish Terriara/Calamity and Apoc Refrence Sheets
+- Twitch/YT for new posts and streams
 - Overwatch, Apex Leg., and Mojang APIs
+- Make a more discriptive help command
