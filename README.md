@@ -7,22 +7,8 @@ A Gaming Utility Discord bot written in Python with Nextcord.
 First, clone the repo to your system of choice, make a file called `config.py` <!--`config.json`--> and copy paste this template into it:
 
 ```python
-token = "1234567890"
+TOKEN = "1234567890"
 TUsers = []
-```
-
-<!--
-```json
-{
-    "global": [
-        "token": "ADD TOKEN HERE"
-        "trustedusers": [user id, another user id, maximum is set to 10 due to for loops getting slow past that]
-        "apikeys": [Mojang API key, Twitch API key, more added later]
-    ]
-    "server id":[
-        "defaultroles": [role id, another role id, can have infinite ids here]
-    ]
-}
 ```
 
 this is a draft of the .json file
@@ -32,7 +18,20 @@ keep this here until it is useful
 - `token` is your bot token, which can be grabbed from [here](https://discord.com/developers/applications).
 - `TUsers` are users with admin access to the bot, like the `/debug` and other similar commands.
 
-*note, eventually this will switch from a .py to a .json for simplicity and usability, but thats low on priority right now.*
+Note, eventually this will switch from a .py to a .json for simplicity and usability, but thats low on priority right now. This is the possible format for said updated config file
+
+```json
+{
+    "global": [
+        "TOKEN": "ADD TOKEN HERE"
+        "TUsers": [user id, another user id, as many as you need]
+        "apikeys": [Mojang API key, Twitch API key, more added later]
+    ]
+    "server id":[
+        "defaultroles": [role id, another role id, can have infinite ids here (unlike other services, looking at you Dyno and YAGPDB)]
+    ]
+}
+```
 
 ## Plans
 

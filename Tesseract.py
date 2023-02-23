@@ -1,16 +1,24 @@
-from config import *
-import math, random, os, sys, asyncio, json, requests, nextcord, logging
-from nextcord.ext import commands
-from nextcord import ui
-from libretranslatepy import LibreTranslateAPI
+try:
+    from config import *
+    import math, random, os, sys, asyncio, json, requests, nextcord, logging
+    from nextcord.ext import commands
+    from nextcord import ui
+    from libretranslatepy import LibreTranslateAPI
+except Exception as e:
+    print(e)
+    # g = input()
+    # os.system("pip3 install libretranslatepy")
 
 # settup
 
-logger = logging.getLogger('nextcord')
-logger.setLevel(logging.DEBUG)
-handler = logging.FileHandler(filename='nextcord.log', encoding='utf-8', mode='w')
-handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
-logger.addHandler(handler)
+# Temp removele due to it breaking 3.10, also not used very much.
+# Will be added back asap.
+#
+# logger = logging.getLogger('nextcord')
+# logger.setLevel(logging.DEBUG)
+# handler = logging.FileHandler(filename='nextcord.log', encoding='utf-8', mode='w')
+# handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
+# logger.addHandler(handler)
 
 lt = LibreTranslateAPI("https://translate.argosopentech.com/")
 
@@ -24,6 +32,15 @@ status = [
     "the last of us",
     "the server"
 ]
+denied = [
+    "no.",
+    "non",
+    "you dont have permision to use this command.",
+    "stop.",
+    "the wrath of obama is opon you.",
+    "no, go away."
+]
+restart_flag = False
 
 # global Functions:
 
@@ -150,7 +167,7 @@ class DropdownViewTR(nextcord.ui.View):
 class Main(commands.Bot):
     @bot.event
     async def on_ready():
-        await bot.change_presence(activity=nextcord.Activity(type=nextcord.ActivityType.watching, name='ur mum'))
+        await bot.change_presence(activity=nextcord.Activity(type=nextcord.ActivityType.watching, name=status[random.randint(1, len(status))]))
         print(f"Ready!")
 
     @bot.slash_command(description='A command for testing, replies with "Pong!" and the ping in ms')
@@ -226,15 +243,25 @@ class Main(commands.Bot):
             print(temp)
             if type == "restart":
                 await ctx.send("Restarting Bot!")
-                os.execl(sys.executable, *sys.argv)
+                global restart_flag
+                restart_flag = True
+                await bot.close()
             if type == "dump":
                 dumpEmbed = nextcord.Embed(title='config dump', colour=0xffffff)
                 dumpEmbed.add_field(name='TUsers', value=str(TUsers))
                 dumpEmbed.add_field(name='h', value='h')
                 await ctx.response.send_message(embed=dumpEmbed)
         else:
-            await ctx.send("You don't have permission to use this command.")
+            await ctx.send(denied[random.randint(1, len(denied))])
     
 if __name__ == "__main__":
     print(f"attempting to start bot, please be patient.")
-    bot.run(token)
+    bot.run(TOKEN)
+    while True:
+        try:
+            if restart_flag:
+                os.execl(sys.executable, *([sys.executable] + sys.argv))
+                break
+            bot.run(TOKEN)
+        except Exception as e:
+            print(e)
