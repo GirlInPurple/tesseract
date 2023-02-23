@@ -1,11 +1,7 @@
 from config import *
-
-import math, random, os, sys, asyncio, json, requests
-
-import nextcord, logging, youtube_dl
+import math, random, os, sys, asyncio, json, requests, nextcord, logging
 from nextcord.ext import commands
 from nextcord import ui
-
 from libretranslatepy import LibreTranslateAPI
 
 # settup
@@ -22,6 +18,12 @@ lt = LibreTranslateAPI("https://translate.argosopentech.com/")
 
 orX, orZ, orY = 0, 0, 64 #might change to 0,0,0 later on, but this makes more sense as this spot is likely on the surface and thus better distances can be made.
 plus = "+" # dont question it, used in /point and the man function
+status = [
+    "ur mum",
+    "you",
+    "the last of us",
+    "the server"
+]
 
 # global Functions:
 
@@ -58,7 +60,6 @@ class DropdownMain(nextcord.ui.Select):
         global select
         select = [
             nextcord.SelectOption(label="Minecraft"),
-            nextcord.SelectOption(label="Apoc"),
             nextcord.SelectOption(label="Terraria")
         ]
         super().__init__(placeholder="Select Game", min_values=1, max_values=1, options=select)
@@ -68,7 +69,7 @@ class DropdownMain(nextcord.ui.Select):
             view = DropdownViewMC()
         elif self.values[0] == "Terraria":
             view = DropdownViewTR()
-        await interaction.response.send_message(f'You choose {self.values[0]}. Pick a Ref.', view=view)
+        await interaction.response.send_message(f'You choose {self.values[0]}. Pick a Ref.', view=status[random.randint(1, len(status))])
 
 class DropdownMC(nextcord.ui.Select):
     def __init__(self):
@@ -144,13 +145,12 @@ class DropdownViewTR(nextcord.ui.View):
         super().__init__()
         self.add_item(DropdownTR())
 
-# setup end here
-# bot starts here
+# command scripts:
 
 class Main(commands.Bot):
     @bot.event
     async def on_ready():
-        await bot.change_presence(activity=nextcord.Activity(type=nextcord.ActivityType.watching, name='you.'))
+        await bot.change_presence(activity=nextcord.Activity(type=nextcord.ActivityType.watching, name='ur mum'))
         print(f"Ready!")
 
     @bot.slash_command(description='A command for testing, replies with "Pong!" and the ping in ms')
@@ -195,8 +195,20 @@ class Main(commands.Bot):
     async def help(inter):
     
         helpEmbed = nextcord.Embed(title='Tesseract Help/About', colour=0xffffff)
-        helpEmbed.add_field(name='Main Contributers', value='***<@624191654282395648>:*** Helping with the bot a little\n***<@625855485773611018>:*** Asked for Apoc1 support for his private server, I obliged')
-        helpEmbed.add_field(name='Commands', value='`/help`: This embed you\'re looking at now with everything you will ever need\n`/point`: A complex command for dealing with shapes, lines, and other geometry, very useful for complex farms in Minecraft as they have to just the right distance away depending on the farm.\n`/ref`: The remade refrence commmand, it displays refrences from 3 different games, Apoc, Minecraft, and Terraria/Calamity.')
+        helpEmbed.add_field(name='Main Contributers', value='''
+                            ***<@624191654282395648>:*** Helping with the bot a little.\n
+                            ***<@625855485773611018>:*** Asked for Apoc1 support for his private server, I obliged
+                            (This feature has been removed from the bot, but still credited for helping build the `/ref` framework.)
+                            ''')
+        helpEmbed.add_field(name='Commands', value='''
+                            `/ping`: Responds "Ping!" with the time it took to send the packet to Discord in ms.\n
+                            `/roll`: \n
+                            `/point`: A complex command for dealing with shapes, lines, and other geometry, very useful for complex farms in Minecraft as they have to just the right distance away depending on the farm.\n
+                            `/ref`: The remade refrence commmand, it displays refrences from 3 different games, Apoc, Minecraft, and Terraria/Calamity. \n
+                            `/help`: This embed you\'re looking at now with everything you will ever need/\n
+                            `/translate`: \n
+                            `/debug`: no touchy.
+                            ''')
         await inter.response.send_message(embed=helpEmbed)
         
     @bot.slash_command(description='Translates inputed text into another language. Not English > English, English > French.')
@@ -208,6 +220,21 @@ class Main(commands.Bot):
         
         await inter.response.send_message(embed=TranslateEmbed)
 
+    @bot.slash_command(description='A debug command, not for you')
+    async def debug(ctx: nextcord.Interaction, type:str = "restart"):
+        if (temp := ctx.user.id) in TUsers:
+            print(temp)
+            if type == "restart":
+                await ctx.send("Restarting Bot!")
+                os.execl(sys.executable, *sys.argv)
+            if type == "dump":
+                dumpEmbed = nextcord.Embed(title='config dump', colour=0xffffff)
+                dumpEmbed.add_field(name='TUsers', value=str(TUsers))
+                dumpEmbed.add_field(name='h', value='h')
+                await ctx.response.send_message(embed=dumpEmbed)
+        else:
+            await ctx.send("You don't have permission to use this command.")
+    
 if __name__ == "__main__":
     print(f"attempting to start bot, please be patient.")
     bot.run(token)
