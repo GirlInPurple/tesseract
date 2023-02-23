@@ -30,7 +30,7 @@ keep this here until it is useful
 -->
 
 - `token` is your bot token, which can be grabbed from [here](https://discord.com/developers/applications).
-- `TUsers` are users with admin access to the bot, like the `/jsondump`, `/restart`, and `/` commands
+- `TUsers` are users with admin access to the bot, like the `/debug` and other similar commands.
 
 *note, eventually this will switch from a .py to a .json for simplicity and usability, but thats low on priority right now.*
 
