@@ -1,24 +1,53 @@
 # Tesseract
+
 A Gaming Utility Discord bot written in Python with Nextcord.
 
-## Setup:
-First, clone the repo,
-Make a file called "config.py" and copy paste this template into it:
+## Setup
 
-```
+First, clone the repo to your system of choice, make a file called `config.py` <!--`config.json`--> and copy paste this template into it:
+
+```python
 token = "1234567890"
-TGuilds = []
+TUsers = []
 ```
+
+<!--
+```json
+{
+    "global": [
+        "token": "ADD TOKEN HERE"
+        "trustedusers": [user id, another user id, maximum is set to 10 due to for loops getting slow past that]
+        "apikeys": [Mojang API key, Twitch API key, more added later]
+    ]
+    "server id":[
+        "defaultroles": [role id, another role id, can have infinite ids here]
+    ]
+}
+```
+
+this is a draft of the .json file
+keep this here until it is useful
+-->
 
 - `token` is your bot token, which can be grabbed from [here](https://discord.com/developers/applications).
-- `TGuilds` are the test servers built into the bot, useful if you only want 1 or 2 servers to have access to a certain debug command.
+- `TUsers` are users with admin access to the bot, like the `/jsondump`, `/restart`, and `/` commands
 
-## Contributing:
-If you are on the FinalRepublic Discord server that this bot is for, add whatever you want and submit a PR and we can talk it over there.
-For everyone else looking here for whatever reason, feel free to submit a RP or just fork off this project and go your own direction, its MIT lisence for a reason.
+*note, eventually this will switch from a .py to a .json for simplicity and usability, but thats low on priority right now.*
 
-## TODO:
-- Finish Terriara/Calamity and Apoc Refrence Sheets
+## Plans
+
+- Finish Terriara/Calamity and Apoc Reference Sheets
 - Twitch/YT for new posts and streams
 - Overwatch, Apex Leg., and Mojang APIs
-- Make a more discriptive help command
+- Make a more descriptive help command
+- Music commands
+- Default roles when joining a server
+- 3 strikes moderation command
+
+## Contributing
+
+Feel free to submit a PR or just fork off this project and go your own direction, its MIT license for a reason.
+
+## Credits
+
+- [Nextcord Bot Examples](https://github.com/nextcord/nextcord/tree/master/examples)
