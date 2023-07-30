@@ -1,48 +1,13 @@
 try:
-    from config import *
+    from config import * #depricated
     import math, random, os, sys, asyncio, json, requests, nextcord, logging
     from nextcord.ext import commands
     from nextcord import ui
     from libretranslatepy import LibreTranslateAPI
 except Exception as e:
     print(e)
-    # g = input()
-    # os.system("pip3 install libretranslatepy")
 
-# settup
-
-# Temp removele due to it breaking 3.10, also not used very much.
-# Will be added back asap.
-#
-# logger = logging.getLogger('nextcord')
-# logger.setLevel(logging.DEBUG)
-# handler = logging.FileHandler(filename='nextcord.log', encoding='utf-8', mode='w')
-# handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
-# logger.addHandler(handler)
-
-lt = LibreTranslateAPI("https://translate.argosopentech.com/")
-
-# constants:
-
-orX, orZ, orY = 0, 0, 64 #might change to 0,0,0 later on, but this makes more sense as this spot is likely on the surface and thus better distances can be made.
-plus = "+" # dont question it, used in /point and the man function
-status = [
-    "ur mum",
-    "you",
-    "the last of us",
-    "the server"
-]
-denied = [
-    "no.",
-    "non",
-    "you dont have permision to use this command.",
-    "stop.",
-    "the wrath of obama is opon you.",
-    "no, go away."
-]
-restart_flag = False
-
-# global Functions:
+# global functions
 
 def pyth(x1, z1, x2, z2): # A modified Pythagorean Equation; sqrt((x2-x1)^2)+(z2-z1)^2)) = d
     return math.sqrt(pow((x2-x1),2)+pow((z2-z1),2))
@@ -64,12 +29,100 @@ def man(x1, z1, x2, z2, out):
 	elif out == "+":
 		return x + z
 
+def LocalFiles():
+    return os.path.dirname(os.path.realpath(__file__))
+
+def APIRequest(url: str, params: dict ):
+    resp = requests.get(url=url, params=params)
+    data = resp.json()
+
+# logger set up
+
+# Temp removed due to it breaking 3.10 and the machine its being hosted on. Its also not used very much
+# Will be added back asap, possibly next commit
+#
+# logger = logging.getLogger('nextcord')
+# logger.setLevel(logging.DEBUG)
+# handler = logging.FileHandler(filename='nextcord.log', encoding='utf-8', mode='w')
+# handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
+# logger.addHandler(handler)
+
+# translate
+
+lt = LibreTranslateAPI("https://translate.argosopentech.com/")
+
+# constants (dont change plz)
+
+Version = "v0.1.1"
+
+orX, orZ, orY = 0, 0, 64 #might change to 0,0,0 later on, but this makes more sense as this spot is likely on the surface and thus better distances can be made.
+plus = "+" # dont question it, used in /point and the man function
+status = [
+    "ur mum",
+    "you",
+    "the last of us",
+    "the server"
+]
+denied = [
+    "no.",
+    "non",
+    "you dont have permision to use this command.",
+    "stop.",
+    "the wrath of obama is opon you.",
+    "no, go away."
+]
+restart_flag = False
+DefaultConfig = '''
+{
+    "ConfigVer": "1",
+    "Global": {
+        "Token": "ADD TOKEN HERE",
+        "Trusted": ["ADD YOUR ID HERE"],
+        "APIs": {
+            "Translate": {
+                "HTTPS": "unimplemented",
+                "Key": ["unimplemented"]
+            },
+            "Dictionary": {
+                "HTTPS": "https://api.dictionaryapi.dev/api/v2/entries/en/%PY%",
+                "Key": [null]
+            },
+            "Weather": {
+                "HTTPS": "unimplemented",
+                "Key": ["unimplemented"]
+            },
+            "Blank": {
+                "HTTPS": "unimplemented",
+                "Request":"unimplemented",
+                "Key": ["unimplemented"]
+            }
+        }
+    },
+    "SERVER ID HERE": {
+        "Admins": "ADMIN ROLE IDS",
+        "AutoRoles": "AUTO ROLE IDS HERE",
+        "Disabled": []
+    }
+}
+'''
+
+# JSON setup
+
+#if bool(os.path.exists(LocalFiles() + r"\settings.json")) != True:
+#    os.chdir(LocalFiles())
+#    with open("config.json", "x") as NewConfig:
+#        NewConfig.write(DefaultConfig)
+#            
+#with open(LocalFiles() + "\config.json", "r") as ReadConfig:
+#    global ConfigData
+#    ConfigData = json.load(ReadConfig)
+#    print(ConfigData)
+
 # bot settup:
 
 intents = nextcord.Intents.default() 
 intents.message_content = True 
 bot = commands.Bot(command_prefix="$", intents=intents)
-
 
 # bot scripts:
 class DropdownMain(nextcord.ui.Select):
@@ -168,7 +221,7 @@ class Main(commands.Bot):
     @bot.event
     async def on_ready():
         await bot.change_presence(activity=nextcord.Activity(type=nextcord.ActivityType.watching, name=status[random.randint(1, len(status))]))
-        print(f"Ready!")
+        print(f"Tessaract {Version} is ready!")
 
     @bot.slash_command(description='A command for testing, replies with "Pong!" and the ping in ms')
     async def ping(inter):
@@ -237,6 +290,10 @@ class Main(commands.Bot):
         
         await inter.response.send_message(embed=TranslateEmbed)
 
+    #@bot.slash_command()
+    #async def dict():
+        
+
     @bot.slash_command(description='A debug command, not for you')
     async def debug(ctx: nextcord.Interaction, type:str = "restart"):
         if (temp := ctx.user.id) in TUsers:
@@ -255,13 +312,12 @@ class Main(commands.Bot):
             await ctx.send(denied[random.randint(1, len(denied))])
     
 if __name__ == "__main__":
-    print(f"attempting to start bot, please be patient.")
+    print(f"Attempting to start Tesseract version {Version}, please be patient.")
     bot.run(TOKEN)
     while True:
         try:
             if restart_flag:
                 os.execl(sys.executable, *([sys.executable] + sys.argv))
-                break
             bot.run(TOKEN)
         except Exception as e:
             print(e)

@@ -1,47 +1,51 @@
 # Tesseract
 
-A Gaming Utility Discord bot written in Python with Nextcord.
+A Gaming Utility Discord bot written in Python with the PyCord library.
 
 ## Setup
 
-First, clone the repo to your system of choice, make a file called `config.py` <!--`config.json`--> and copy paste this template into it:
+### Docker Container
 
-```python
-TOKEN = "1234567890"
-TUsers = []
+Run the following command when you have the image installed:
+```
+docker run \
+    -d \
+    -it \
+    --name tesseract \
+    --restart=unless-stopped \
+    -v /home/user/tesseract:/data \ #optional
+    -e TOKEN=12345678901234567890 \
+-i tesseract
 ```
 
-this is a draft of the .json file
-keep this here until it is useful
--->
+### Running the script on its own
+
+You're going to have to make an environment variable called `TOKEN`, then just drop the script into whatever folder you want to be the main folder. I recommend placing a `.bat` file in your startup folder for restarting the bot if you do this.
+
+### Running older versions
+
+These versions are not recommended to run due to bugs and unfinished features, but if you wish to run them, place a file named `config.py` and copy-paste this template into it:
+
+```python
+TOKEN = "12345678901234567890"
+TUsers = []
+```
 
 - `token` is your bot token, which can be grabbed from [here](https://discord.com/developers/applications).
 - `TUsers` are users with admin access to the bot, like the `/debug` and other similar commands.
 
-Note, eventually this will switch from a .py to a .json for simplicity and usability, but thats low on priority right now. This is the possible format for said updated config file
-
-```json
-{
-    "global": [
-        "TOKEN": "ADD TOKEN HERE"
-        "TUsers": [user id, another user id, as many as you need]
-        "apikeys": [Mojang API key, Twitch API key, more added later]
-    ]
-    "server id":[
-        "defaultroles": [role id, another role id, can have infinite ids here (unlike other services, looking at you Dyno and YAGPDB)]
-    ]
-}
-```
-
 ## Plans
 
-- Finish Terriara/Calamity and Apoc Reference Sheets
 - Twitch/YT for new posts and streams
-- Overwatch, Apex Leg., and Mojang APIs
+- Roblox, Apex Leg., and Mojang APIs
 - Make a more descriptive help command
-- Music commands
 - Default roles when joining a server
-- 3 strikes moderation command
+- Finish the Wiki system (might be merged into another project)
+
+### What I wont do
+
+- Music commands
+- Moderation systems
 
 ## Contributing
 
@@ -49,4 +53,11 @@ Feel free to submit a PR or just fork off this project and go your own direction
 
 ## Credits
 
+### People
+
+wip
+
+### Sites
+
 - [Nextcord Bot Examples](https://github.com/nextcord/nextcord/tree/master/examples)
+- [PyCord](https://guide.pycord.dev/)
